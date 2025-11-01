@@ -35,6 +35,7 @@ InitialClimbPlugin::InitialClimbPlugin(void) :CPlugIn(EuroScopePlugIn::COMPATIBI
 
 	// Register Tag Item "Initial climb"
 	RegisterTagItemType("Initial Climb", TAG_ITEM_INITIALCLIMB);
+	RegisterTagItemType("Departure Frequency", TAG_ITEM_DEPFREQ);
 	RegisterTagItemFunction("Add to CFL", TAG_FUNC_ADDTOCFL);
 
 	// Get Path of the Sid.json
@@ -240,6 +241,37 @@ void InitialClimbPlugin::OnGetTagItem(CFlightPlan FlightPlan, CRadarTarget Radar
 		}
 
 		if (ItemCode == TAG_ITEM_INITIALCLIMB)
+		{
+			string FlightPlanString = FlightPlan.GetFlightPlanData().GetRoute();
+			int RFL = FlightPlan.GetFlightPlanData().GetFinalAltitude();
+
+			*pColorCode = TAG_COLOR_RGB_DEFINED;
+			string fpType{ FlightPlan.GetFlightPlanData().GetPlanType() };
+			if (fpType == "V") {
+				*pRGB = TAG_GREEN;
+				strcpy_s(sItemString, 16, "VFR");
+			}
+			else {
+				if (hasInitialClimbSet)
+				{
+					if (FlightPlan.GetControllerAssignedData().GetClearedAltitude() == std::stoi(txt) * 100)
+					{
+						*pRGB = TAG_GREEN;
+						strcpy_s(sItemString, 16, initialAlt);
+					}
+					else {
+						*pRGB = TAG_RED;
+						strcpy_s(sItemString, 16, initialAlt);
+					}
+
+				}
+				else {
+					*pRGB = TAG_GREY;
+					strcpy_s(sItemString, 16, "-");
+				}
+			}
+		}
+		if (ItemCode == TAG_ITEM_DEPFREQ)
 		{
 			string FlightPlanString = FlightPlan.GetFlightPlanData().GetRoute();
 			int RFL = FlightPlan.GetFlightPlanData().GetFinalAltitude();

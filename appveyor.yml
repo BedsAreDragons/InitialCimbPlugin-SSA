@@ -1,0 +1,52 @@
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+version: 1.1.{build}
+
+branches:
+  only:
+    - master
+  except:
+    - gh-pages
+
+max_jobs: 1
+
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+
+os: Visual Studio 2022
+
+platform:
+  - x86
+
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
+
+install:
+  # Initialize submodules if any
+  - cmd: git submodule update --init --recursive
+  # Optional: show MSBuild version
+  - cmd: msbuild /version
+
+configuration: Release
+
+build_script:
+  # Replace with your actual solution path
+  - cmd: msbuild "InitialClimbPlugin.sln" /m /p:Configuration=Release /p:Platform=Win32 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+after_build:
+  # Create a folder to collect the DLL
+  - cmd: mkdir InitialClimbPlugin-nightly
+  - cmd: copy "Release\InitialClimbPlugin.dll" InitialClimbPlugin-nightly\
+  # Zip the artifact
+  - cmd: 7z a InitialClimbPlugin-nightly.zip %APPVEYOR_BUILD_FOLDER%\InitialClimbPlugin-nightly\
+
+#---------------------------------#
+#      artifacts configuration    #
+#---------------------------------#
+
+artifacts:
+  - path: InitialClimbPlugin-nightly.zip

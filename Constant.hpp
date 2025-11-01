@@ -2,6 +2,7 @@
 #include "stdafx.h"
 
 const int TAG_ITEM_INITIALCLIMB = 1;
+const int TAG_ITEM_DEPFREQ = 2;
 
 const int TAG_FUNC_ADDTOCFL = 100;
 const int TAG_FUNC_ON_OFF = 102;
